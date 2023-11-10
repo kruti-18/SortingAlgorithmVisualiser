@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="globals.css">
+    <title>Sorting Algorithm Visualizer</title>
+</head>
+<style>
+    .sorting-button {
+        font-size: 1.2rem;
+        text-underline-offset: 0.3rem;
+        background-color: var(--background);
+        border: none;
+
+        text-decoration: underline;
+        color: var(--primary);
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+    }
+
+    @media screen and (min-width: 768px) {
+        .container {
+            width: 80%;
+        }
+
+    }
+
+    ul {
+        list-style: none;
+        text-indent: 0;
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    li {
+        margin: 0.5rem 0;
+        text-indent: 0;
+        padding: 0;
+    }
+
+    .sorting-button:hover {
+        color: var(--secondary);
+    }
+</style>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Sorting Algorithm Visualizer</h1>
+            <p class="text-muted">Welcome to the Sorting Algorithm Visualizer, a powerful tool that brings sorting
+                algorithms to life.
+                Here, you'll witness the elegance and efficiency of various sorting techniques as data elements
+                seamlessly rearrange themselves into ordered sequences. Whether you're a coding enthusiast, a curious
+                learner, or a seasoned developer, this platform offers an enlightening journey into the world of sorting
+                algorithms.</p>
+            <p class="text-muted">Choose an algorithm to visualise: </p>
+        </header>
+        <ul>
+            <li>
+                &gt; <button class="sorting-button" id="bubble-sort">
+                    Bubble Sort &rarr;</button>
+            </li>
+            <li>
+                &gt; <button class="sorting-button" id="merge-sort">Merge
+                    Sort &rarr;</button>
+            </li>
+            <li>
+                &gt; <button class="sorting-button" id="quick-sort">Quick
+                    Sort &rarr;</button>
+            </li>
+            <li>
+                &gt; <button class="sorting-button" id="insertion-sort">Insertion Sort &rarr;</button>
+            </li>
+            <li>
+                &gt; <button class="sorting-button" id="selection-sort">Selection Sort &rarr;</button>
+            </li>
+
+        </ul>
+        <footer>
+            <hr>
+            <p>Developed with ❤️ by Kruti Dewda</p>
+        </footer>
+    </div>
+</body>
+<script>
+    document.getElementById("bubble-sort").addEventListener("click", () => {
+        window.location.href = "bubble-sort.html";
+    });
+    document.getElementById("merge-sort").addEventListener("click", () => {
+        window.location.href = "merge-sort.html";
+    });
+    document.getElementById("quick-sort").addEventListener("click", () => {
+        window.location.href = "quick-sort.html";
+    });
+    document.getElementById("insertion-sort").addEventListener("click", () => {
+        window.location.href = "insertion-sort.html";
+    });
+    document.getElementById("selection-sort").addEventListener("click", () => {
+        window.location.href = "selection-sort.html";
+    });
+</script>
+
+</html>

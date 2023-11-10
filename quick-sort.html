@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="globals.css">
+    <title>Quicksort Visualizer</title>
+</head>
+<style>
+    .array-element.pivot {
+        background-color: #f7a240;
+    }
+
+    .array-element.sorted {
+        background-color: #8bc34a;
+    }
+
+    .array-element.comparing {
+        border-color: var(--primary);
+        box-shadow: 0 0 5px var(--primary);
+    }
+
+    .array-element.swapped {
+        border-color: red;
+        box-shadow: 0 0 5px red;
+    }
+</style>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Quicksort Visualizer</h1>
+            <p class="text-muted">Quick Sort is a highly efficient sorting algorithm based on the divide-and-conquer
+                strategy. It selects a pivot element, partitions the list into two sublists, and recursively sorts them.
+                The process continues until the entire list is sorted.</p>
+        </header>
+        <h2>Array Input</h2>
+        <input class="array-input" id="array-input" placeholder="Enter numbers, separated by spaces...">
+        <button class="submit-array" id="submit-array">Sort</button>
+        <div class="input-error" id="input-error"></div>
+        <h2>Array Output</h2>
+        <div class="array" id="array"></div>
+        <div class="status" id="status"></div>
+        <footer>
+            <hr>
+            <p>Developed with ❤️ by Kruti Dewda</p>
+        </footer>
+    </div>
+    <script>
+        const sleep = async (ms) => {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        const parseArrayInput = (inputStr) => {
+            const tokens = inputStr.trim().split(/\s+/);
+            const array = tokens.map(elem => parseFloat(elem));
+            if (array.length !== tokens.length || array.some(elem => isNaN(elem)))
+                return null;
+            return array;
+        }
+        const insertArrayToHtml = (array) => {
+            const html = '<div class="array-element">' +
+                array.join('</div><div class="array-element">') +
+                '</div>';
+            document.getElementById('array').innerHTML = html;
+        }
+        const highlightElements = (i, j, additionalClass) => {
+            const array = document.getElementById('array').children;
+            array[i].classList.add(additionalClass);
+            array[j].classList.add(additionalClass);
+        }
+        const setStatus = (status) => {
+            const statusElem = document.getElementById('status');
+            statusElem.innerHTML = status === 'comparing' ? 'Comparing...' : 'Swapping...';
+            statusElem.className = status;
+        }
+        const quicksort = async (arr, low, high) => {
+            if (low < high) {
+                const pivotIndex = await partition(arr, low, high);
+                await quicksort(arr, low, pivotIndex - 1);
+                await quicksort(arr, pivotIndex + 1, high);
+            } else {
+                insertArrayToHtml(arr);
+                for (let i = low; i <= high; i++) {
+                    const array = document.getElementById('array').children;
+                    array[i].classList.add('sorted');
+                }
+                await sleep(1000);
+            }
+        }
+        const partition = async (arr, low, high) => {
+            const pivot = arr[high];
+            let i = low - 1;
+            for (let j = low; j < high; j++) {
+                insertArrayToHtml(arr);
+                highlightElements(j, high, 'comparing');
+                setStatus('comparing');
+                await sleep(1000);
+                if (arr[j] < pivot) {
+                    i++;
+                    [arr[i], arr[j]] = [arr[j], arr[i]];
+                    insertArrayToHtml(arr);
+                    highlightElements(i, j, 'swapped');
+                    setStatus('swapping');
+                    await sleep(1000);
+                }
+            }
+            [arr[i + 1], arr[high]] = [arr[high], arr[i + 1]];
+            insertArrayToHtml(arr);
+            highlightElements(i + 1, high, 'swapped');
+            setStatus('swapping');
+            await sleep(1000);
+            return i + 1;
+        }
+        const quicksortWrapper = async () => {
+            const array = parseArrayInput(document.getElementById('array-input').value);
+            if (!array) {
+                document.getElementById('input-error').innerHTML = 'Incorrect input!';
+                return;
+            }
+            document.getElementById('input-error').innerHTML = '';
+            await quicksort(array, 0, array.length - 1);
+            insertArrayToHtml(array);
+            document.getElementById('status').innerHTML = '';
+        }
+        document.getElementById('submit-array').addEventListener('click', quicksortWrapper);
+    </script>
+</body>
+
+</html>

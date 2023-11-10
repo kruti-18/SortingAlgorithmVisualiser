@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="globals.css">
+    <title>Selection Sort Visualizer</title>
+</head>
+<style>
+    .array-element.sorted {
+        background-color: #8bc34a;
+    }
+
+    .array-element.comparing {
+        border-color: var(--primary);
+        box-shadow: 0 0 5px var(--primary);
+    }
+
+    .swapping {
+        color: var(--primary);
+    }
+</style>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Selection Sort Visualizer</h1>
+            <p class="text-muted">Selection Sort is a basic sorting algorithm that repeatedly selects the smallest (or
+                largest) element and places it in the sorted part of the list. It is simple to implement but may not be
+                as efficient as other sorting methods for larger datasets.</p>
+        </header>
+        <h2>Array Input</h2>
+        <input class="array-input" id="array-input" placeholder="Enter numbers, separated by spaces...">
+        <button class="submit-array" id="submit-array">Sort</button>
+        <div class="input-error" id="input-error"></div>
+        <h2>Array Output</h2>
+        <div class="array" id="array"></div>
+        <div class="status" id="status"></div>
+        <footer>
+            <hr>
+            <p>Developed with ❤️ by Kruti Dewda</p>
+        </footer>
+    </div>
+    <script>
+        const sleep = async (ms) => {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        const parseArrayInput = (inputStr) => {
+            const tokens = inputStr.trim().split(/\s+/);
+            const array = tokens.map(elem => parseFloat(elem));
+            if (array.length !== tokens.length || array.some(elem => isNaN(elem)))
+                return null;
+            return array;
+        }
+        const insertArrayToHtml = (array) => {
+            const html = '<div class="array-element">' +
+                array.join('</div><div class="array-element">') +
+                '</div>';
+            document.getElementById('array').innerHTML = html;
+        }
+        const highlightElements = (i, j, additionalClass) => {
+            const array = document.getElementById('array').children;
+            array[i].classList.add(additionalClass);
+            array[j].classList.add(additionalClass);
+        }
+        const setStatus = (status) => {
+            const statusElem = document.getElementById('status');
+            statusElem.innerHTML = status === 'swapping' ? 'Swapping...' : '';
+            statusElem.className = status;
+        }
+        const selectionSort = async (arr) => {
+            const n = arr.length;
+            for (let i = 0; i < n - 1; i++) {
+                let minIndex = i;
+                for (let j = i + 1; j < n; j++) {
+                    insertArrayToHtml(arr);
+                    highlightElements(j, minIndex, 'comparing');
+                    setStatus('swapping');
+                    await sleep(1000);
+                    if (arr[j] < arr[minIndex]) {
+                        minIndex = j;
+                    }
+                }
+                [arr[i], arr[minIndex]] = [arr[minIndex], arr[i]];
+                insertArrayToHtml(arr);
+                highlightElements(i, minIndex, 'comparing');
+                setStatus('swapping');
+                await sleep(1000);
+            }
+        }
+        const selectionSortWrapper = async () => {
+            const array = parseArrayInput(document.getElementById('array-input').value);
+            if (!array) {
+                document.getElementById('input-error').innerHTML = 'Incorrect input!';
+                return;
+            }
+            document.getElementById('input-error').innerHTML = '';
+            await selectionSort(array);
+            insertArrayToHtml(array);
+            document.getElementById('status').innerHTML = '';
+        }
+        document.getElementById('submit-array').addEventListener('click', selectionSortWrapper);
+    </script>
+</body>
+
+</html>

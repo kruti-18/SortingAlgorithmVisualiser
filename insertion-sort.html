@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="globals.css">
+    <title>Insertion Sort Visualizer</title>
+</head>
+<style>
+    .array-element.sorted {
+        background-color: #8bc34a;
+    }
+
+    .array-element.comparing {
+        border-color: var(--primary);
+        box-shadow: 0 0 5px var(--primary);
+    }
+
+    .shifting {
+        color: var(--primary);
+    }
+</style>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Insertion Sort Visualizer</h1>
+            <p class="text-muted">Insertion Sort is a straightforward and efficient sorting algorithm. It builds a
+                sorted list by iteratively inserting elements into their correct positions. It performs well for small
+                or partially sorted datasets but may become less efficient for larger lists.</p>
+        </header>
+        <h2>Array Input</h2>
+        <input class="array-input" id="array-input" placeholder="Enter numbers, separated by spaces...">
+        <button class="submit-array" id="submit-array">Sort</button>
+        <div class="input-error" id="input-error"></div>
+        <h2>Array Output</h2>
+        <div class="array" id="array"></div>
+        <div class="status" id="status"></div>
+        <footer>
+            <hr>
+            <p>Developed with ❤️ by Kruti Dewda</p>
+        </footer>
+    </div>
+    <script>
+        const sleep = async (ms) => {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        const parseArrayInput = (inputStr) => {
+            const tokens = inputStr.trim().split(/\s+/);
+            const array = tokens.map(elem => parseFloat(elem));
+            if (array.length !== tokens.length || array.some(elem => isNaN(elem)))
+                return null;
+            return array;
+        }
+        const insertArrayToHtml = (array) => {
+            const html = '<div class="array-element">' +
+                array.join('</div><div class="array-element">') +
+                '</div>';
+            document.getElementById('array').innerHTML = html;
+        }
+        const highlightElements = (start, end, additionalClass) => {
+            const array = document.getElementById('array').children;
+            for (let i = start; i <= end; i++) {
+                array[i].classList.add(additionalClass);
+            }
+        }
+        const setStatus = (status) => {
+            const statusElem = document.getElementById('status');
+            statusElem.innerHTML = status === 'shifting' ? 'Shifting...' : '';
+            statusElem.className = status;
+        }
+        const insertionSort = async (arr) => {
+            const n = arr.length;
+            for (let i = 1; i < n; i++) {
+                const key = arr[i];
+                let j = i - 1;
+
+                while (j >= 0 && arr[j] > key) {
+                    arr[j + 1] = arr[j];
+                    insertArrayToHtml(arr);
+                    highlightElements(j, j + 1, 'comparing');
+                    setStatus('shifting');
+                    await sleep(1000);
+                    j--;
+                }
+
+                arr[j + 1] = key;
+                insertArrayToHtml(arr);
+                setStatus('shifting');
+                await sleep(1000);
+            }
+        }
+        const insertionSortWrapper = async () => {
+            const array = parseArrayInput(document.getElementById('array-input').value);
+            if (!array) {
+                document.getElementById('input-error').innerHTML = 'Incorrect input!';
+                return;
+            }
+            document.getElementById('input-error').innerHTML = '';
+            await insertionSort(array);
+            insertArrayToHtml(array);
+            document.getElementById('status').innerHTML = '';
+        }
+        document.getElementById('submit-array').addEventListener('click', insertionSortWrapper);
+    </script>
+</body>
+
+</html>

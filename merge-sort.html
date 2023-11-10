@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="globals.css">
+    <title>Merge Sort Visualizer</title>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Merge Sort Visualizer</h1>
+            <p class="text-muted">Merge Sort is an efficient sorting algorithm that uses the divide-and-conquer method.
+                It divides the list, sorts each half, and merges them to obtain the final sorted result. With a time
+                complexity of O(n log n), Merge Sort is suitable for sorting large datasets while maintaining stability
+                in the order of equal elements.</p>
+        </header>
+        <h2>Array Input</h2>
+        <input class="array-input" id="array-input" placeholder="Enter numbers, separated by spaces...">
+        <button class="submit-array" id="submit-array">Sort</button>
+        <div class="input-error" id="input-error"></div>
+        <h2>Array Output</h2>
+        <div class="array" id="array"></div>
+        <div class="status" id="status"></div>
+        <footer>
+            <hr>
+            <p>Developed with ❤️ by Kruti Dewda</p>
+        </footer>
+    </div>
+    <script>
+        const sleep = async (ms) => {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        const parseArrayInput = (inputStr) => {
+            const tokens = inputStr.trim().split(/\s+/);
+            const array = tokens.map(elem => parseFloat(elem));
+            if (array.length !== tokens.length || array.some(elem => isNaN(elem)))
+                return null;
+            return array;
+        }
+        const insertArrayToHtml = (array) => {
+            const html = '<div class="array-element">' +
+                array.join('</div><div class="array-element">') +
+                '</div>';
+            document.getElementById('array').innerHTML = html;
+        }
+        const highlightElements = (start, end, additionalClass) => {
+            const array = document.getElementById('array').children;
+            for (let i = start; i <= end; i++) {
+                array[i].classList.add(additionalClass);
+            }
+        }
+        const setStatus = (status) => {
+            const statusElem = document.getElementById('status');
+            statusElem.innerHTML = status === 'merging' ? 'Merging...' : '';
+            statusElem.className = status;
+        }
+        const mergeSort = async (arr, start, end) => {
+            if (start < end) {
+                const mid = Math.floor((start + end) / 2);
+                await mergeSort(arr, start, mid);
+                await mergeSort(arr, mid + 1, end);
+                await merge(arr, start, mid, end);
+            } else {
+                insertArrayToHtml(arr);
+                document.getElementById('array').children[start].classList.add('sorted');
+                await sleep(1000);
+            }
+        }
+        const merge = async (arr, start, mid, end) => {
+            const leftArr = arr.slice(start, mid + 1);
+            const rightArr = arr.slice(mid + 1, end + 1);
+
+            let i = 0;
+            let j = 0;
+            let k = start;
+
+            while (i < leftArr.length && j < rightArr.length) {
+                insertArrayToHtml(arr);
+                highlightElements(start + i, end - (rightArr.length - j), 'comparing');
+                setStatus('merging');
+                await sleep(1000);
+
+                if (leftArr[i] <= rightArr[j]) {
+                    arr[k] = leftArr[i];
+                    i++;
+                } else {
+                    arr[k] = rightArr[j];
+                    j++;
+                }
+                insertArrayToHtml(arr);
+                setStatus('merging');
+                await sleep(1000);
+
+                k++;
+            }
+
+            while (i < leftArr.length) {
+                arr[k] = leftArr[i];
+                insertArrayToHtml(arr);
+                setStatus('merging');
+                await sleep(1000);
+
+                i++;
+                k++;
+            }
+
+            while (j < rightArr.length) {
+                arr[k] = rightArr[j];
+                insertArrayToHtml(arr);
+                setStatus('merging');
+                await sleep(1000);
+
+                j++;
+                k++;
+            }
+        }
+        const mergeSortWrapper = async () => {
+            const array = parseArrayInput(document.getElementById('array-input').value);
+            if (!array) {
+                document.getElementById('input-error').innerHTML = 'Incorrect input!';
+                return;
+            }
+            document.getElementById('input-error').innerHTML = '';
+            await mergeSort(array, 0, array.length - 1);
+            insertArrayToHtml(array);
+            document.getElementById('status').innerHTML = '';
+        }
+        document.getElementById('submit-array').addEventListener('click', mergeSortWrapper);
+    </script>
+</body>
+
+</html>

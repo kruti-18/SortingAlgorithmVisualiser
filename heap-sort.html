@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heap Sort Visualizer</title>
+</head>
+<style>
+    body {
+        font-size: 1.5rem;
+    }
+    .container {
+        margin-top: 100px;
+        margin-right: auto;
+        margin-left: auto;
+        width: 80%;
+        min-width: 360px;
+    }
+    .array-input-lable {
+        display: block;
+        margin-bottom: 10px;
+    }
+    .array-input {
+        display: block;
+        height: 50px;
+        box-sizing: border-box;
+        outline: none;
+        width: 600px;
+        max-width: 100%;
+        padding-left: 10px;
+        border-radius: 5px;
+        border: 1px solid black;
+        font: inherit;
+        margin-bottom: 10px;
+    }
+    .submit-array {
+        height: 40px;
+        border-radius: 5px;
+        border: none;
+        color: white;
+        background-color: #09a0aa;
+        font: inherit;
+        width: 600px;
+        max-width: 100%;
+    }
+    .submit-array:hover {
+        background-color: #06585e;
+        transform: scale(1.02);
+    }
+    .array-input:focus {
+        border: 1px solid #09a0aa;
+        box-shadow: 0 0 5px #09a0aa;
+    }
+    .input-error {
+        color: red;
+    }
+    .array {
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+    }
+    .array-element {
+        box-sizing: border-box;
+        height: 50px;
+        padding: 10px;
+        border: 1px solid black;
+        border-radius: 5px;
+        margin-right: 10px;
+        margin-bottom: 10px;
+    }
+    .array-element.sorted {
+        background-color: #8bc34a;
+    }
+    .array-element.comparing {
+        border-color: blue;
+        box-shadow: 0 0 5px blue;
+    }
+    .swapping {
+        color: blue;
+    }
+</style>
+<body>
+    <div class="container">
+        <h2>Heap Sort Visualizer</h2>
+        <h3>Array Input</h3>
+        <input class="array-input" id="array-input" placeholder="Enter numbers, separated by spaces...">
+        <button class="submit-array" id="submit-array">Sort</button>
+        <div class="input-error" id="input-error"></div>
+        <h3>Array Output</h3>
+        <div class="array" id="array"></div>
+        <div class="status" id="status"></div>
+        <p>Developed with ❤️ by Kruti Dewda</p>
+    </div>
+    <script>
+        const sleep = async (ms) => {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        const parseArrayInput = (inputStr) => {
+            const tokens = inputStr.trim().split(/\s+/);
+            const array = tokens.map(elem => parseFloat(elem));
+            if (array.length !== tokens.length || array.some(elem => isNaN(elem)))
+                return null;
+            return array;
+        }
+        const insertArrayToHtml = (array) => {
+            const html = '<div class="array-element">' +
+                array.join('</div><div class="array-element">') +
+                '</div>';
+            document.getElementById('array').innerHTML = html;
+        }
+        const highlightElements = (start, end, additionalClass) => {
+            const array = document.getElementById('array').children;
+            for (let i = start; i <= end; i++) {
+                array[i].classList.add(additionalClass);
+            }
+        }
+        const setStatus = (status) => {
+            const statusElem = document.getElementById('status');
+            statusElem.innerHTML = status === 'swapping' ? 'Swapping...' : '';
+            statusElem.className = status;
+        }
+        const heapify = async (arr, n, i) => {
+            let largest = i;
+            let left = 2 * i + 1;
+            let right = 2 * i + 2;
+
+            if (left < n && arr[left] > arr[largest]) {
+                largest = left;
+            }
+
+            if (right < n && arr[right] > arr[largest]) {
+                largest = right;
+            }
+
+            if (largest !== i) {
+                [arr[i], arr[largest]] = [arr[largest], arr[i]];
+                insertArrayToHtml(arr);
+                highlightElements(i, largest, 'comparing');
+                setStatus('swapping');
+                await sleep(1000);
+                await heapify(arr, n, largest);
+            }
+        }
+        const heapSort = async (arr) => {
+            const n = arr.length;
+
+            for (let i = Math.floor(n / 2) - 1; i >= 0; i--) {
+                await heapify(arr, n, i);
+            }
+
+            for (let i = n - 1; i > 0; i--) {
+                [arr[0], arr[i]] = [arr[i], arr[0]];
+                insertArrayToHtml(arr);
+                highlightElements(0, i, 'comparing');
+                setStatus('swapping');
+                await sleep(1000);
+                await heapify(arr, i, 0);
+            }
+        }
+        const heapSortWrapper = async () => {
+            const array = parseArrayInput(document.getElementById('array-input').value);
+            if (!array) {
+                document.getElementById('input-error').innerHTML = 'Incorrect input!';
+                return;
+            }
+            document.getElementById('input-error').innerHTML = '';
+            await heapSort(array);
+            insertArrayToHtml(array);
+            document.getElementById('status').innerHTML = '';
+        }
+        document.getElementById('submit-array').addEventListener('click', heapSortWrapper);
+    </script>
+</body>
+</html>
